@@ -9,6 +9,9 @@ import com.iesvdc.acceso.entidades.Cliente;
 import com.iesvdc.acceso.vista.VistaHTML;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -20,20 +23,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet para dar de alta un cliente en la BBDD.
- * Usamos los verbos GET y POST de HTTP para primero 
- * renderizar el formulario y luego capturar los datos 
- * del mismo. Todo con la misma URL.
+ *
  * @author juangu
  */
-public class ClienteCreate extends HttpServlet {
+public class ClienteDelete extends HttpServlet {
 
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("GestionPedidosv2PU");    
-    
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("GestionPedidosv2PU");
+    // EntityManager em; 
+
     /**
-     * Manejador del método <code>GET</code>.
-     * Muestra el formulario para crear un cliente.
-     * 
+     * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -42,21 +42,26 @@ public class ClienteCreate extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // processRequest(request, response);
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            VistaHTML vh = new VistaHTML();            
+            VistaHTML vh = new VistaHTML();
+
+            EntityManager em = emf.createEntityManager();
             
-            out.println(vh.renderCabecera());        
-            out.println(vh.renderClienteForm());
+            List<Cliente> lc = em.createNamedQuery("Cliente.findAll").getResultList();
+                                
+            out.println(vh.renderCabecera());
+            out.println(vh.renderTitle("Eliminar un cliente:"));
+            out.println(vh.renderSelectCliente(lc));
             out.println(vh.renderPie());
+            
+            em.close();
         }
     }
 
     /**
-     * Manejador del método <code>POST</code>.
-     * Captura los parámetros del formulario que vemos con el GET.
-     * 
+     * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -65,34 +70,40 @@ public class ClienteCreate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // processRequest(request, response);
-        EntityManager em = emf.createEntityManager();
-        String nombre = request.getParameter("nombre"), 
-                apellido = request.getParameter("apellido"), 
-                direccion = request.getParameter("direccion");
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            EntityManager em = emf.createEntityManager();
             VistaHTML vh = new VistaHTML();
             out.println(vh.renderCabecera());
-            if (nombre!= null && apellido!=null && direccion!=null){
-                // inserto en la BBDD
-                Cliente c = new Cliente(null, nombre, apellido, direccion);
-                if (!this.persist(c)) {
-                    // mensaje de error
-                    out.println(
-                        vh.renderError("ClienteCreate Error:", "Error al insertar en la base de datos."));
-                } else {
-                    // mensaje de inserción correcta
-                    out.println(
-                        vh.renderSuccess("ClienteCreate:", "cliente insertado correctamente."));
-                }
-            } else {
-                //mensaje de error
-                out.println(
-                    vh.renderError("ClienteCreate Error:", "Error en los parámetros de la petición."));
-            }
+            
+            String[] lista = request.getParameterValues("delCli");
+          
+            Cliente c;
+            for (String id : lista){     
+                c = em.find(Cliente.class, new Integer(id));
+                // c = em.getReference(Cliente.class, Integer.parseInt(id));
+                // c = em.find(Cliente.class, Integer.parseInt(id));
+                try {
+                    em.getTransaction().begin();
+                    em.remove(c);
+                    em.getTransaction().commit();
+                    vh.renderSuccess("ClienteDelete", 
+                        "El cliente "+c.getApellido()+", "+c.getNombre()+" ha sido eliminado");
+                } catch (Exception e) {
+                    // em.getTransaction().rollback();
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+                    vh.renderError("ClienteDelete", 
+                        "El cliente "+c.getApellido()+", "+c.getNombre()+" no se puede eliminar");
+                } finally {
+                    em.flush();
+                    em.close();
+                }                                        
+            } 
+            
             out.println(vh.renderPie());
-        }
+            // em.flush();
+            em.close();
+        } 
     }
 
     /**
@@ -105,8 +116,7 @@ public class ClienteCreate extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    public boolean persist(Object object) {
-        boolean resultado=true;
+    public void persist(Object object) {       
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
@@ -115,11 +125,9 @@ public class ClienteCreate extends HttpServlet {
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
             em.getTransaction().rollback();
-            resultado=false;
         } finally {
-            em.close();
+           em.close();
         }
-        return resultado;
     }
-
+    
 }

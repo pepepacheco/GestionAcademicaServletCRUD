@@ -80,19 +80,58 @@ public class VistaHTML {
 "		<form role=\"form\" method=\"post\">\n" +
 "		  <div class=\"form-group\">\n" +
 "		    <label for=\"nombre\">Nombre:</label>\n" +
-"		    <input type=\"nombre\" class=\"form-control\" id=\"nombre\">\n" +
+"		    <input type=\"nombre\" class=\"form-control\" name=\"nombre\">\n" +
 "		  </div>	\n" +
 "		  <div class=\"form-group\">\n" +
 "		    <label for=\"apellido\">Apellidos:</label>\n" +
-"		    <input type=\"apellido\" class=\"form-control\" id=\"apellido\">\n" +
+"		    <input type=\"apellido\" class=\"form-control\" name=\"apellido\">\n" +
 "		  </div>	\n" +
 "		  <div class=\"form-group\">\n" +
 "		    <label for=\"direccion\">Dirección:</label>\n" +
-"		    <input type=\"direccion\" class=\"form-control\" id=\"direccion\">\n" +
+"		    <input type=\"direccion\" class=\"form-control\" name=\"direccion\">\n" +
 "		  </div>		  \n" +
 "		  <button type=\"submit\" class=\"btn btn-default\">Submit</button>\n" +
 "		</form>\n" +
 "	</div>";
         return (clienteForm);
+    }
+    
+    public String renderError(String title, String msg){
+        String resultado = "";
+        resultado += "<h3>"+title+"</h3>";
+        resultado += "<div class=\"alert alert-danger\">\n" +
+"  <strong>ERROR:</strong> "+msg+".\n" +
+"</div>";
+        return resultado;
+    }
+    
+    public String renderSuccess(String title, String msg){
+        String resultado = "";
+        resultado += "<h3>"+title+"</h3>";
+        resultado += "<div class=\"alert alert-success\">\n" +
+"  <strong>EXITO:</strong> "+msg+".\n" +
+"</div>";
+        return resultado;
+    }
+
+    public String renderSelectCliente(List<Cliente> lc) {
+        String resultado="";
+        resultado+="<div class=\"well\">\n" +
+"		<form role=\"form\" method=\"POST\">\n" +
+"		   <div class=\"form-group\">\n" +
+"			<label for=\"delCli\">Selecciona el cliente a borrar:</label>\n" +
+"			<select multiple class=\"form-control\" id=\"delCli\" name=\"delCli\">\n";  
+
+        for ( Cliente c : lc){
+            resultado+= "<option value='"+c.getIdCliente()+"'> " +
+               c.getApellido() + ", " + c.getNombre() + "</option>";
+        }
+        
+        resultado+="			  </select>\n" +
+"				</div>		  \n" +
+"		  <button type=\"submit\" class=\"btn btn-default\">Submit</button>\n" +
+"		</form>\n" +
+"	</div>";
+        return resultado;
     }
 }
