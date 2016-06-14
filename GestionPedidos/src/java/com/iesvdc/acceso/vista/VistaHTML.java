@@ -13,19 +13,51 @@ import java.util.List;
  * @author juangu
  */
 public class VistaHTML {
-    static String cabecera="<!DOCTYPE html>\n" +        
-        "<html>\n" +
-        "    <head>\n" +
-        "        <title>Gestión de Pedidos v2</title>\n" +
-        "        <meta charset=\"UTF-8\">\n" +
-        "        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-        "        <link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" rel=\"stylesheet\" />\n" +
-        "        <script src=\"https://code.jquery.com/jquery-1.12.4.min.js\"> </script> \n" +
-        "        <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\" ></script>\n" +
-        "    </head>\n" +
-        "    <body>\n" +
-        "        <div class=\"container\">\n" +
-        "            <h1>Gestión de pedidos on-line</h1>\n";            
+    static String cabecera="<!DOCTYPE html>\n" +
+"<!--\n" +
+"To change this license header, choose License Headers in Project Properties.\n" +
+"To change this template file, choose Tools | Templates\n" +
+"and open the template in the editor.\n" +
+"-->\n" +
+"<html>\n" +
+"    <head>\n" +
+"        <title>Gestión de Pedidos v2</title>\n" +
+"        <meta charset=\"UTF-8\">\n" +
+"        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+"        <link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" rel=\"stylesheet\" />\n" +
+"        <script src=\"https://code.jquery.com/jquery-1.12.4.min.js\"> </script> \n" +
+"        <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\" ></script>\n" +
+"    </head>\n" +
+"    <body>\n" +
+"        <div class=\"container\">            \n" +
+"            <nav class=\"navbar navbar-default\" role=\"navigation\">\n" +
+"                <div class=\"navbar-header\">\n" +
+"                    <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\"\n" +
+"                            data-target=\".navbar-ex1-collapse\">\n" +
+"                      <span class=\"sr-only\">Desplegar navegación</span>\n" +
+"                      <span class=\"icon-bar\"></span>\n" +
+"                      <span class=\"icon-bar\"></span>\n" +
+"                      <span class=\"icon-bar\"></span>\n" +
+"                    </button>\n" +
+"                    <a class=\"navbar-brand\" href=\"#\">Gestion2</a>\n" +
+"                </div>\n" +
+"                <div class=\"collapse navbar-collapse navbar-ex1-collapse\">                    \n" +
+"                <ul class=\"nav navbar-nav\">\n" +
+"                    <li class=\"dropdown-down\">\n" +
+"                        <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">\n" +
+"                           Gestión de clientes <b class=\"caret\"></b>\n" +
+"                        </a>\n" +
+"                        <ul class=\"dropdown-menu\">\n" +
+"                            <li><a href=\"ClienteRead\">Listado de clientes</a></li>\n" +
+"                            <li><a href=\"ClienteCreate\">Dar de alta un cliente</a></li>\n" +
+"                            <li><a href=\"ClienteDelete\">Dar de baja clientes</a></li>\n" +
+"                            <li><a href=\"ClienteUpdate\">Modificar un cliente</a></li>\n" +
+"                        </ul>\n" +
+"                    </li>\n" +
+"                </ul>\n" +
+"                </div>\n" +
+"            </nav>" +
+"            <div class=\"container\">";            
     static String cuerpo = "            <div class=\"well\">\n" +
         "                Aqui va el menu principal\n" +
         "            </div>\n";
@@ -114,13 +146,15 @@ public class VistaHTML {
         return resultado;
     }
 
-    public String renderSelectCliente(List<Cliente> lc) {
+    public String renderSelectCliente(List<Cliente> lc, boolean multiple) {
         String resultado="";
         resultado+="<div class=\"well\">\n" +
 "		<form role=\"form\" method=\"POST\">\n" +
 "		   <div class=\"form-group\">\n" +
-"			<label for=\"delCli\">Selecciona el cliente a borrar:</label>\n" +
-"			<select multiple class=\"form-control\" id=\"delCli\" name=\"delCli\">\n";  
+"			<label for=\"delCli\">Selecciona el cliente:</label>\n" +
+"			<select ";
+        if (multiple) resultado+="multiple";
+        resultado +=" class=\"form-control\" name=\"idCli\">\n";  
 
         for ( Cliente c : lc){
             resultado+= "<option value='"+c.getIdCliente()+"'> " +
@@ -133,5 +167,30 @@ public class VistaHTML {
 "		</form>\n" +
 "	</div>";
         return resultado;
+    }
+
+    public String renderClienteForm(Cliente c) {
+        String clienteForm = "<div class=\"well\">\n" +
+"		<form role=\"form\" method=\"post\">\n" +
+"		  <div class=\"form-group\">\n" +
+"		    <label for=\"nombre\">Nombre:</label>\n" +
+"		    <input type=\"text\" class=\"form-control\" name=\"nombre\" value=\""+
+                c.getNombre()+"\">\n" +
+"		  </div>	\n" +
+"		  <div class=\"form-group\">\n" +
+"		    <label for=\"apellido\">Apellidos:</label>\n" +
+"		    <input type=\"text\" class=\"form-control\" name=\"apellido\" value=\""+
+                c.getApellido()+"\">\n" +
+"		  </div>	\n" +
+"		  <div class=\"form-group\">\n" +
+"		    <label for=\"direccion\">Dirección:</label>\n" +
+"		    <input type=\"text\" class=\"form-control\" name=\"direccion\" value=\""+
+                c.getDireccion()+"\">\n" +
+"		  </div>	"
+                + "<input name=\"idCli\" type=\"hidden\" value=\""+c.getIdCliente()+"\">	  \n" +
+"		  <button type=\"submit\" class=\"btn btn-default\">Submit</button>\n" +
+"		</form>\n" +
+"	</div>";
+        return (clienteForm);
     }
 }

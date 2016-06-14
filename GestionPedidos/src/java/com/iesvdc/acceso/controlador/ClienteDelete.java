@@ -52,7 +52,7 @@ public class ClienteDelete extends HttpServlet {
                                 
             out.println(vh.renderCabecera());
             out.println(vh.renderTitle("Eliminar un cliente:"));
-            out.println(vh.renderSelectCliente(lc));
+            out.println(vh.renderSelectCliente(lc, true));
             out.println(vh.renderPie());
             
             em.close();
@@ -76,33 +76,31 @@ public class ClienteDelete extends HttpServlet {
             VistaHTML vh = new VistaHTML();
             out.println(vh.renderCabecera());
             
-            String[] lista = request.getParameterValues("delCli");
+            String[] lista = request.getParameterValues("idCli");
           
             Cliente c;
             for (String id : lista){     
-                c = em.find(Cliente.class, new Integer(id));
+                // c = em.find(Cliente.class, new Integer(id));
                 // c = em.getReference(Cliente.class, Integer.parseInt(id));
-                // c = em.find(Cliente.class, Integer.parseInt(id));
+                c = em.find(Cliente.class, Integer.parseInt(id));
                 try {
                     em.getTransaction().begin();
                     em.remove(c);
                     em.getTransaction().commit();
-                    vh.renderSuccess("ClienteDelete", 
-                        "El cliente "+c.getApellido()+", "+c.getNombre()+" ha sido eliminado");
+                    out.println(vh.renderSuccess("ClienteDelete", 
+                        "El cliente "+c.getApellido()+", "+c.getNombre()+" ha sido eliminado"));
                 } catch (Exception e) {
-                    // em.getTransaction().rollback();
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
-                    vh.renderError("ClienteDelete", 
-                        "El cliente "+c.getApellido()+", "+c.getNombre()+" no se puede eliminar");
+                    em.getTransaction().rollback();
+                    // Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+                    out.println(vh.renderError("ClienteDelete", 
+                        "El cliente "+c.getApellido()+", "+c.getNombre()+" no se puede eliminar"));
                 } finally {
-                    em.flush();
-                    em.close();
+                    // em.flush();
                 }                                        
             } 
-            
+            em.close();
             out.println(vh.renderPie());
             // em.flush();
-            em.close();
         } 
     }
 
